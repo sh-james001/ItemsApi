@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Items API</title>
+</head>
+<body>
+    <h1>Item List</h1>
+    <form id="itemForm">
+        <input type="text" id="name" placeholder="Name">
+        <input type="text" id="description" placeholder="Description">
+        <button type="submit">Add Item</button>
+    </form>
+
+    <ul id="itemsList"></ul>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function(){
+            const form = document.getElementById('itemForm');
+            const itemsList = document.getElementById('itemsList');
+
+            function fetchItems(){
+                fetch('/api')
+                .then(response => response.json())
+                .then(items => {
+                    itemsList.innerHTML = "";
+                    items.forEach(item => {
+                        const li = document.createElement('li');
+                        li.textContent = `${item.name}; ${item.description}`;
+                        itemsList.appendChild(li);
+                    });
+                });
+            }
+
+            form.addEventListener('submit', function(event){
+                event.preventDefault();
+                const name = document.getElementById('name').value;
+                const description = document.getElementById('description').value;
+
+                fetch('/api', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name: name, description: description }),
+                })
+                .then(response => response.json())
+                .then(item => {
+                    const li = document.createElement('li');
+                    li.textContent = `${item.name}; ${item.description}`;
+                    itemsList.appendChild(li);
+                    form.reset();
+                });
+            });
+
+            fetchItems();
+        });
+    </script>
+</body>
+</html>
